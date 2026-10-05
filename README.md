@@ -18,6 +18,18 @@ Welcome! This repository is my space to learn by building, testing ideas, and ex
 
 ## Make your first change in the browser
 
+```mermaid
+flowchart LR
+  M[main: shared working version] --> B[Create experiment branch]
+  B --> E[Edit one idea]
+  E --> C[Commit: save a snapshot]
+  C --> P[Pull request: propose the change]
+  P --> T[CI tests and code review]
+  T -->|Pass and review resolved| Merge[Merge into main]
+  T -->|Fail| E
+  Merge --> Site[Publish portfolio]
+```
+
 1. Open `docs/index.html` in the Code tab. Click the pencil to edit it.
 2. Change one sentence about what you are learning. Keep planned projects labeled as planned.
 3. Click **Commit changes**, write a clear message, and choose **Create a new branch for this commit and start a pull request**.
@@ -26,6 +38,24 @@ Welcome! This repository is my space to learn by building, testing ideas, and ex
 6. After the change reaches `main`, the same workflow tests it and republishes the portfolio. A successful PR check does not itself publish a preview.
 
 ## How CI and publishing work
+
+```mermaid
+flowchart TD
+  Change[Push to main or open a pull request] --> Tests[Syntax checks + HTTP authentication tests]
+  Tests --> L22[Linux / Node 22]
+  Tests --> L24[Linux / Node 24]
+  Tests --> W22[Windows / Node 22]
+  Tests --> W24[Windows / Node 24]
+  L22 --> Gate{All four pass?}
+  L24 --> Gate
+  W22 --> Gate
+  W24 --> Gate
+  Gate -->|No| Fix[Read the failed log and fix the code]
+  Gate -->|Yes: pull request| Review[Ready for human review]
+  Gate -->|Yes: main| Package[Package only docs/]
+  Package --> Deploy[GitHub Pages deployment]
+  Deploy --> Public[Public portfolio website]
+```
 
 The workflow tests JavaScript syntax and authentication behavior on Node 22 and 24, on both Linux and Windows. This checks four combinations. No package installation is needed because this project has no external dependencies.
 
@@ -51,6 +81,17 @@ npm.cmd start
 Open http://127.0.0.1:3000. Register a made-up username and a password of at least 12 characters, enter the password again, then log in. Click **Who am I?**, then **Log out**. Open browser DevTools → Network and Application → Cookies to follow the process. `npm.cmd run dev` restarts on source edits and resets accounts and sessions. Stop with Ctrl+C. Set `$env:PORT = '3001'` before starting to use another port.
 
 ## Components and request flow
+
+```mermaid
+flowchart LR
+  Visitor[Portfolio visitor] --> Pages[GitHub Pages]
+  Pages --> HTML[docs/index.html: public portfolio]
+  Learner[You on your own computer] --> Browser[public/: login experiment UI]
+  Browser --> HTTP[server.mjs: local HTTP server]
+  HTTP --> Accounts[In-memory accounts: salt + password hash]
+  HTTP --> Sessions[In-memory sessions: token hash + expiry]
+  Checks[test/auth.test.mjs] --> HTTP
+```
 
 | Component | Code | Responsibility |
 | --- | --- | --- |
@@ -84,6 +125,23 @@ sequenceDiagram
 
 ### Credentials and tokens
 
+```mermaid
+flowchart TD
+  Password[Made-up password] --> Salt[Random salt + scrypt]
+  Salt --> Stored[Server memory: salt + password hash]
+  Password --> Verify[At login: repeat hash and compare]
+  Stored --> Verify
+  Verify -->|Correct| Token[Create random session token]
+  Token --> Cookie[Raw token in HttpOnly browser cookie]
+  Token --> Digest[SHA-256 digest stored in server session map]
+  Cookie --> Request[Browser sends cookie with protected request]
+  Request --> Lookup[Hash the cookie token and look up the session]
+  Digest --> Lookup
+  Lookup --> Expiry{Session exists and has not expired?}
+  Expiry -->|Yes| Allow[Return account information]
+  Expiry -->|No| Deny[401: please log in]
+```
+
 - **Password:** transmitted in the registration/login JSON body. The browser clears the password field after submitting. The server derives a 64-byte scrypt hash with a random 16-byte salt and stores the salt and hash in memory. It compares hashes with `timingSafeEqual`; it never stores the plaintext password or logs request bodies. Password hashing is one-way, not encryption. Local HTTP traffic is not encrypted; use only invented credentials.
 - **Session token (`sid`):** a random 32-byte opaque value. The browser stores the raw value in an `HttpOnly`, `SameSite=Strict` cookie. JavaScript cannot read that cookie; the browser attaches it to same-origin requests. The server stores only its SHA-256 digest. Possession of the raw token grants access, so never paste it into commits or screenshots.
 - **Session expiry:** fixed 15 minutes, checked on the server on every protected request. Login replaces the session supplied by that browser. Logout deletes it immediately and expires the cookie. Restarting clears every account and session.
@@ -96,6 +154,15 @@ sequenceDiagram
 The server binds to `127.0.0.1`. Accounts are deliberately disposable. This is not ready for deployment: it lacks rate limiting, persistent storage, account recovery, email verification, MFA, role authorization and resource limits. Cookies omit `Secure` because the exercise uses local HTTP; a deployed version needs HTTPS and secure cookies. Origin checks reject browser POSTs from other sites; JSON-only registration/login and a CSRF check on logout add protection. Do not expose this server on the internet or use real credentials.
 
 ## Experiments
+
+```mermaid
+flowchart LR
+  Question[Ask one question] --> Predict[Write your prediction]
+  Predict --> Change[Make one small change]
+  Change --> Test[Run tests and observe requests]
+  Test --> Explain[Explain what actually happened]
+  Explain --> Question
+```
 
 1. **Read before changing:** inspect the Network tab for `/api/register`, `/api/login`, `/api/me` and `/api/logout`. Predict each status before clicking.
 2. **Expiry:** change the default `sessionTtlMs` in `createApp` to 10,000. Log in, wait ten seconds, and request `/api/me`. Expect 401.
