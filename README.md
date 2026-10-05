@@ -69,6 +69,30 @@ Official references: [GitHub flow](https://docs.github.com/en/get-started/using-
 
 `mamditis58/stash` was empty when inspected on October 5, 2026. This is a new educational starter, not an explanation of pre-existing code. It uses Node's built-in HTTP and crypto modules; no packages, database, API keys, GitHub token, or OAuth setup are required.
 
+## Protected changes and Codex review
+
+`main` is the shared version. Its branch protection rule requires a pull request and four passing test jobs. The branch must be up to date with `main`. Review conversations must be resolved before merge. These rules also apply to the repository owner. Force pushes and branch deletion are blocked.
+
+No approval count is required because this is a solo learning repository. You must still read the change and any review findings before you merge it.
+
+```mermaid
+flowchart LR
+  Branch[Change on a branch] --> PR[Open a pull request]
+  PR --> CI[Four required test jobs]
+  PR --> Bot[Codex reviews the change]
+  CI --> Read[Read the change and review findings]
+  Bot --> Read
+  Read --> Fix[Fix problems and resolve conversations]
+  Fix --> Merge[Merge into protected main]
+  Merge --> Pages[Test again and publish portfolio]
+```
+
+The ChatGPT Codex Connector is installed. Automatic review was enabled in Codex settings. You can also post `@codex review` on a pull request to request a review. Codex uses the code review rules in `AGENTS.md`. Its review helps find problems, but it does not replace your own checks. A Codex review is not a required status check in this branch rule.
+
+`AGENTS.md` also requires STE-informed plain language. Use short sentences and common words. Define a technical term when it is first needed. Keep code names and technical facts correct. This rule covers code comments, docs, reviews, and messages.
+
+See the [official Codex GitHub guide](https://learn.chatgpt.com/docs/third-party/github) for review settings and commands.
+
 ## Run on Windows
 
 Requires Node.js 22 or newer (verified with 22.18.0).
@@ -112,11 +136,11 @@ sequenceDiagram
   S->>U: Save salt + scrypt hash
   S-->>B: 201 (no session yet)
   B->>S: POST /api/login (username, password)
-  S->>U: Read salt; recompute and compare hash
+  S->>U: Read salt, recompute and compare hash
   S->>T: Save hash(session token), username, CSRF, expiry
   S-->>B: HttpOnly sid cookie + CSRF in JSON
   B->>S: GET /api/me with cookie automatically attached
-  S->>T: Hash cookie; look up session; check expiry
+  S->>T: Hash cookie, look up session, check expiry
   S-->>B: Username + CSRF, or 401
   B->>S: POST /api/logout with cookie + X-CSRF-Token
   S->>T: Check CSRF and delete session
