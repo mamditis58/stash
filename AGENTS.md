@@ -2,6 +2,18 @@
 
 This is a beginner's learning playground with a static portfolio and a disposable local Node authentication example.
 
+## Required writing style
+
+Always use an STE-informed plain-language version of ASD-STE100 Simplified Technical English for all written work. Apply this rule to code comments, documentation, user-facing text, commit messages, pull requests, reviews, explanations, and messages to the user.
+
+- Use short sentences and common words. Use active voice when it makes the meaning clear.
+- Give each sentence one main idea. Give each instruction one clear action.
+- Use the same word for the same thing. Avoid idioms, vague words, and needless jargon.
+- Define a technical term when the reader first needs it. Explain tasks for a beginner unless the user asks for more detail.
+- Keep names, APIs, syntax, and technical facts correct. Do not change required code identifiers or exact quoted text to fit the writing style.
+- Use clear examples, diagrams, and illustrations when they help explain a process.
+- Treat this as STE-informed plain language. Do not claim full ASD-STE100 compliance or certification.
+
 - Keep changes small and explain the reason in plain language.
 - Keep the public portfolio in `docs/`; the local experiment UI belongs in `public/`.
 - Do not add real credentials, personal data, or account/session dumps to files, logs, tests or screenshots.
