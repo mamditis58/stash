@@ -1,0 +1,8 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width"><title>Stash auth playground</title><script src="/app.js" defer></script></head>
+<body><main><h1>Stash authentication playground</h1><p>Disposable accounts. Restart the server to reset everything. Use made-up credentials.</p>
+<form id="credentials"><p><label>Username <input name="username" autocomplete="username" required minlength="3" maxlength="32"></label></p>
+<p><label>Password <input name="password" type="password" autocomplete="off" required minlength="12" maxlength="128"></label></p>
+<button name="action" value="register">Register</button> <button name="action" value="login">Log in</button></form>
+<p><button id="me">Who am I?</button> <button id="logout">Log out</button></p>
+<h2>Response</h2><pre id="result" aria-live="polite">Register, then log in. Open browser DevTools → Network to follow requests.</pre></main></body></html>
